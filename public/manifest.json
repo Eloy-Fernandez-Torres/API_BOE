@@ -1,0 +1,37 @@
+{
+  "name": "BOE Ayudas — Buscador de Subvenciones",
+  "short_name": "BOE Ayudas",
+  "description": "Busca ayudas, subvenciones y convocatorias publicadas en el Boletín Oficial del Estado.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a3a5c",
+  "lang": "es",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "categories": ["government", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Buscar ayudas",
+      "short_name": "Buscar",
+      "description": "Buscar ayudas y subvenciones en el BOE",
+      "url": "/?utm_source=homescreen",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

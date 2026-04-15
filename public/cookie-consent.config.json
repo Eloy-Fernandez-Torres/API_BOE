@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "cookieName": "boe_cookie_consent",
+  "cookieExpireDays": 365,
+  "language": "es",
+
+  "banner": {
+    "title": "Usamos cookies",
+    "description": "Utilizamos cookies técnicas necesarias para el funcionamiento del sitio. No usamos cookies de publicidad ni de seguimiento.",
+    "acceptAllLabel": "Aceptar todas",
+    "rejectAllLabel": "Solo necesarias",
+    "manageLabel": "Gestionar preferencias",
+    "policyLink": "/cookies.html",
+    "policyLabel": "Política de cookies"
+  },
+
+  "categories": [
+    {
+      "id": "necessary",
+      "name": "Necesarias",
+      "description": "Imprescindibles para el funcionamiento básico del sitio. No pueden desactivarse.",
+      "required": true,
+      "defaultEnabled": true,
+      "cookies": [
+        {
+          "name": "boe_cookie_consent",
+          "purpose": "Recuerda las preferencias de cookies del usuario",
+          "duration": "1 año",
+          "provider": "Este sitio"
+        },
+        {
+          "name": "boe_theme",
+          "purpose": "Guarda la preferencia de tema visual (claro/oscuro)",
+          "duration": "1 año",
+          "provider": "Este sitio"
+        }
+      ]
+    },
+    {
+      "id": "analytics",
+      "name": "Analíticas",
+      "description": "Nos ayudan a entender cómo se usa el servicio para mejorarlo. Actualmente no activas.",
+      "required": false,
+      "defaultEnabled": false,
+      "cookies": []
+    },
+    {
+      "id": "marketing",
+      "name": "Marketing",
+      "description": "Cookies de publicidad y seguimiento. No utilizadas en este servicio.",
+      "required": false,
+      "defaultEnabled": false,
+      "cookies": []
+    }
+  ],
+
+  "styling": {
+    "position": "bottom",
+    "theme": "light",
+    "primaryColor": "#1a3a5c",
+    "accentColor": "#1a6fa8"
+  }
+}

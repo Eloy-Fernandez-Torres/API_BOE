@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# No indexar las páginas legales en resultados de búsqueda principales (opcional)
+# Disallow: /privacy.html
+# Disallow: /terms.html
+# Disallow: /cookies.html
+
+Sitemap: https://tudominio.es/sitemap.xml

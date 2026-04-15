@@ -1,0 +1,19 @@
+{
+  "name": "boe-ayudas-api",
+  "version": "1.0.0",
+  "description": "Buscador de Ayudas y Subvenciones del BOE",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "axios": "^1.4.0",
+    "dotenv": "^16.0.0",
+    "xml2js": "^0.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  }
+}

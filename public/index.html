@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO primario -->
+  <title>BOE Finder | Convocatorias, Ayudas y Subvenciones</title>
+  <meta name="description" content="Buscador gratuito de ayudas, subvenciones y convocatorias publicadas en el Boletín Oficial del Estado. Filtra por sector, tipo y fecha.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tudominio.es/">
+
+  <!-- Open Graph / redes sociales -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tudominio.es/">
+  <meta property="og:title" content="BOE Finder — Ayudas y Subvenciones">
+  <meta property="og:description" content="Busca ayudas y subvenciones del BOE por palabra clave, sector y fecha. Acceso libre y gratuito.">
+  <meta property="og:locale" content="es_ES">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a3a5c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="BOE Finder">
+
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@600;700&family=Raleway:ital,wght@0,100..900;1,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css?v=3">
+
+  <style>
+    /* ── Cookie Banner ─────────────────────────────────────────── */
+    #cookieBanner {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #1a3a5c;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .75rem;
+      z-index: 9999;
+      box-shadow: 0 -2px 12px rgba(0,0,0,.25);
+      font-size: .875rem;
+    }
+    #cookieBanner p { margin: 0; flex: 1 1 260px; }
+    #cookieBanner a { color: #7ec8f7; }
+    .cookie-btns { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .cookie-btns button {
+      padding: .45rem 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+    #cookieAccept  { background: #fff;     color: #1a3a5c; }
+    #cookieReject  { background: transparent; color: #fff; border: 1px solid #fff !important; }
+
+    /* ── Footer legal ──────────────────────────────────────────── */
+    .legal-footer {
+      margin-top: 2.5rem;
+      padding: 1.2rem 0 .8rem;
+      border-top: 1px solid rgba(255,255,255,.12);
+      text-align: center;
+      font-size: .78rem;
+      color: #aaa;
+      line-height: 1.8;
+    }
+    .legal-footer a { color: #7ec8f7; text-decoration: none; margin: 0 .4rem; }
+    .legal-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <!-- ══════════ COOKIE BANNER ══════════ -->
+  <div id="cookieBanner" role="dialog" aria-label="Aviso de cookies" aria-live="polite" hidden>
+    <p>
+      Usamos <strong>cookies técnicas</strong> necesarias para el funcionamiento del sitio.
+      No utilizamos cookies de publicidad ni de seguimiento.
+      <a href="/cookies.html" target="_blank" rel="noopener">Más información</a>
+    </p>
+    <div class="cookie-btns">
+      <button id="cookieAccept" type="button" onclick="window.setCookieConsentAndClose('accepted')">Aceptar</button>
+      <button id="cookieReject" type="button" onclick="window.setCookieConsentAndClose('necessary-only')">Solo necesarias</button>
+    </div>
+  </div>
+
+  <div class="container premium-shell">
+    <header>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Activar modo oscuro" aria-pressed="false">
+        <span class="theme-toggle-icon" aria-hidden="true"></span>
+      </button>
+      <span class="hero-kicker">Plataforma Inteligente BOE</span>
+      <h1 class="boe-title">BOE Finder</h1>
+      <p class="boe-subtitle">Encuentra convocatorias, ayudas y subvenciones del BOE por palabra clave, sector, tipo y fecha.</p>
+      <div class="hero-badges" aria-hidden="true">
+        <span class="hero-badge">Busqueda por sectores</span>
+        <span class="hero-badge">Filtros avanzados</span>
+        <span class="hero-badge">Actualizacion diaria</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- BUSCADOR -->
+      <section class="search-section">
+        <form id="searchForm">
+          <div class="search-bar">
+            <select id="roleSelector" class="select-modern" aria-label="Seleccionar versión de acceso">
+              <option value="estandar" selected>VERSIÓN ESTÁNDAR</option>
+              <option value="pro">VERSIÓN PRO</option>
+              <option value="creador">VERSIÓN CREADOR</option>
+            </select>
+            <input
+              type="text"
+              id="keyword"
+              placeholder="Ej: agricultura, tecnología, cultura..."
+            >
+            <select id="diasAtras" class="select-modern">
+              <option value="3">ÚLTIMOS 3 DÍAS</option>
+              <option value="7" selected>ÚLTIMOS 7 DÍAS</option>
+              <option value="14">ÚLTIMOS 14 DÍAS</option>
+              <option value="30">ÚLTIMO MES</option>
+            </select>
+            <button type="submit">BUSCAR</button>
+          </div>
+        </form>
+        <p id="roleNotice" class="role-notice"></p>
+      </section>
+
+      <section class="premium-stats" aria-label="Indicadores de la plataforma">
+        <article class="premium-stat">
+          <p class="premium-stat-value">+2.000</p>
+          <p class="premium-stat-label">Convocatorias rastreadas</p>
+        </article>
+        <article class="premium-stat">
+          <p class="premium-stat-value">24/7</p>
+          <p class="premium-stat-label">Disponibilidad del buscador</p>
+        </article>
+        <article class="premium-stat">
+          <p class="premium-stat-value">100%</p>
+          <p class="premium-stat-label">Enfoque en datos oficiales BOE</p>
+        </article>
+      </section>
+
+      <!-- CARGA -->
+      <div id="loading" class="loading" hidden>Buscando ayudas...</div>
+
+      <!-- ERROR -->
+      <div id="error" class="error-msg" hidden>
+        <span id="errorText"></span>
+      </div>
+
+      <!-- CONTENIDO PRINCIPAL: filtros + resultados -->
+      <div id="mainContent" class="main-content" hidden>
+
+        <!-- PANEL FILTROS -->
+        <aside class="filters-panel">
+          <h3><span class="filter-title-icon" aria-hidden="true"></span>FILTRAR RESULTADOS</h3>
+
+          <div class="filter-group" id="sectorFilterGroup">
+            <p class="filter-label">Sector</p>
+            <div id="sectorFilters"></div>
+          </div>
+
+          <div class="filter-group" id="tipoFilterGroup">
+            <p class="filter-label">Tipo de ayuda</p>
+            <div id="tipoFilters"></div>
+          </div>
+
+          <button id="clearFilters" class="btn-clear">LIMPIAR FILTROS</button>
+        </aside>
+
+        <!-- RESULTADOS -->
+        <section class="results-section">
+          <div class="results-header">
+            <h2>Resultados</h2>
+            <span id="resultCount" class="result-count">0 ayudas</span>
+          </div>
+          <div id="resultsList"></div>
+          <nav id="pagination" class="pagination" aria-label="Paginación de resultados"></nav>
+        </section>
+      </div>
+
+      <!-- SIN RESULTADOS -->
+      <div id="noResults" class="no-results" hidden>
+        <p>No se encontraron ayudas con los criterios indicados.</p>
+      </div>
+    </main>
+
+    <footer>
+      <p>Datos obtenidos del Boletín Oficial del Estado &mdash; <a href="https://www.boe.es" target="_blank" rel="noopener">boe.es</a></p>
+      <nav class="legal-footer" aria-label="Enlaces legales">
+        <a href="/privacy.html">Privacidad</a> ·
+        <a href="/terms.html">Términos de uso</a> ·
+        <a href="/cookies.html">Cookies</a> ·
+        <a href="/privacy.html#disclaimer">Aviso legal</a>
+        <br>
+        <span>© 2026 BOE Finder — Servicio no oficial. Los datos pertenecen al BOE.</span>
+      </nav>
+    </footer>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    // ── Cookie consent ─────────────────────────────────────────
+    (function () {
+      const CONSENT_KEY = 'boe_cookie_consent';
+
+      function getConsent() {
+        try {
+          return localStorage.getItem(CONSENT_KEY);
+        } catch {
+          return null;
+        }
+      }
+
+      function setConsent(value) {
+        try {
+          localStorage.setItem(CONSENT_KEY, value);
+        } catch {}
+      }
+
+      window.setCookieConsentAndClose = function (value) {
+        const banner = document.getElementById('cookieBanner');
+        setConsent(value);
+        if (banner) {
+          banner.hidden = true;
+          banner.style.display = 'none';
+        }
+      };
+
+      function initCookieBanner() {
+        const banner = document.getElementById('cookieBanner');
+        const acceptBtn = document.getElementById('cookieAccept');
+        const rejectBtn = document.getElementById('cookieReject');
+
+        if (!banner || !acceptBtn || !rejectBtn) return;
+
+        banner.hidden = Boolean(getConsent());
+
+        acceptBtn.addEventListener('click', function (event) {
+          event.preventDefault();
+          window.setCookieConsentAndClose('accepted');
+        });
+
+        rejectBtn.addEventListener('click', function (event) {
+          event.preventDefault();
+          window.setCookieConsentAndClose('necessary-only');
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCookieBanner);
+      } else {
+        initCookieBanner();
+      }
+    })();
+  </script>
+</body>
+</html>
