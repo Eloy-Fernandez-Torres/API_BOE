@@ -481,7 +481,11 @@ function appendAyudaCard(ayuda) {
       ${ayuda.seccion      ? `<div class="meta-item"><strong>Sección:</strong> ${ayuda.seccion}</div>` : ''}
       ${ayuda.fecha        ? `<div class="meta-item"><strong>Fecha:</strong> ${ayuda.fecha}</div>` : ''}
     </div>
-    ${ayuda.url ? `<a class="result-link" href="${ayuda.url}" target="_blank" rel="noopener">Ver en el BOE →</a>` : ''}
+    ${ayuda.monto != null ? `<div class="result-monto"><span class="monto-label">Dotación</span> <strong>${new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(ayuda.monto)}</strong></div>` : ''}
+    <div class="result-actions">
+      ${ayuda.url ? `<a class="result-link" href="${ayuda.url}" target="_blank" rel="noopener">Ver en el BOE →</a>` : ''}
+      ${ayuda.urlPdf ? `<a class="result-link result-link-pdf" href="${ayuda.urlPdf}" target="_blank" rel="noopener">📄 Ver PDF</a>` : ''}
+    </div>
   `;
   resultsListEl.appendChild(card);
 }

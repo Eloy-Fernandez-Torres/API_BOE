@@ -1,5 +1,22 @@
 const boeClient = require('../clients/boeClient');
 const cache = require('../utils/cache');
+const axios = require('axios');
+
+async function fetchMontoFromXML(id) {
+  if (!id) return null;
+  const cacheKey = `monto_${id}`;
+  const cached = cache.get(cacheKey);
+  if (cached !== undefined) return cached;
+  try {
+    const res = await axios.get(`https://www.boe.es/diario_boe/xml.php?id=${id}`, { timeout: 6000 });
+    const texto = String(res.data || '');
+    const monto = parseMontoFromText(texto);
+    cache.set(cacheKey, monto, 24 * 60 * 60 * 1000); // 24h
+    return monto;
+  } catch {
+    return null;
+  }
+}
 
 function fechaAParam(date) {
   const y = date.getFullYear();
@@ -10,19 +27,37 @@ function fechaAParam(date) {
 
 function parseMontoFromText(texto) {
   if (!texto) return null;
-  const normalized = String(texto).replace(/\./g, '').replace(',', '.');
-  const matches = normalized.match(/(\d{1,3}(?:\d{3})*(?:\.\d+)?|\d+(?:\.\d+)?)\s*(€|euros?)/gi);
-  if (!matches || !matches.length) return null;
+  const str = String(texto);
 
-  let maxValue = null;
-  matches.forEach(raw => {
-    const valueMatch = raw.match(/\d+(?:\.\d+)?/);
-    if (!valueMatch) return;
-    const value = parseFloat(valueMatch[0]);
-    if (Number.isNaN(value)) return;
-    if (maxValue == null || value > maxValue) maxValue = value;
-  });
-  return maxValue;
+  // Patrones: "1.500.000 euros", "1.500.000,50 €", "un millón de euros", etc.
+  const results = [];
+
+  // Patrón numérico: 1.500.000,50 € o 1500000 euros
+  const reNumerico = /(\d{1,3}(?:[.,]\d{3})*(?:[.,]\d+)?)\s*(?:€|euros?)/gi;
+  let m;
+  while ((m = reNumerico.exec(str)) !== null) {
+    // Normalizar: quitar puntos de miles, convertir coma decimal a punto
+    let raw = m[1].replace(/\./g, '').replace(',', '.');
+    const val = parseFloat(raw);
+    if (!isNaN(val) && val > 0) results.push(val);
+  }
+
+  // Patrón millones: "3 millones de euros", "3,5 millones"
+  const reMillones = /(\d+(?:[.,]\d+)?)\s*millones?\s*(?:de\s*)?(?:€|euros?)?/gi;
+  while ((m = reMillones.exec(str)) !== null) {
+    const val = parseFloat(m[1].replace(',', '.')) * 1_000_000;
+    if (!isNaN(val) && val > 0) results.push(val);
+  }
+
+  // Patrón miles: "500 mil euros"
+  const reMil = /(\d+(?:[.,]\d+)?)\s*mil\s*(?:€|euros?)/gi;
+  while ((m = reMil.exec(str)) !== null) {
+    const val = parseFloat(m[1].replace(',', '.')) * 1_000;
+    if (!isNaN(val) && val > 0) results.push(val);
+  }
+
+  if (!results.length) return null;
+  return Math.max(...results);
 }
 
 /**
@@ -68,7 +103,7 @@ function extraerDisposicionesRecursivo(obj, resultado = [], ancestors = []) {
  * Intenta extraer el nombre de departamento/sección subiendo en el árbol.
  * Como trabajamos de forma recursiva, lo inferimos del propio nodo.
  */
-function normalizarDisposicion(item) {
+function normalizarDisposicion(item, fechaObj = null) {
   const attrs = item.$ || {};
   const id =
     item.identificador ||
@@ -110,9 +145,25 @@ function normalizarDisposicion(item) {
     (item.url_pdf && (item.url_pdf.texto || item.url_pdf.text)) ||
     (id ? `https://www.boe.es/diario_boe/txt.php?id=${id}` : '');
 
+  // URL directa al PDF del BOE: https://www.boe.es/boe/dias/YYYY/MM/DD/pdfs/{id}.pdf
+  let urlPdf = '';
+  if (id) {
+    if (fechaObj) {
+      const y = fechaObj.getFullYear();
+      const m = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const d = String(fechaObj.getDate()).padStart(2, '0');
+      urlPdf = `https://www.boe.es/boe/dias/${y}/${m}/${d}/pdfs/${id}.pdf`;
+    } else {
+      // Fallback: extraer año del id (BOE-A-2026-XXXX) y usar url_pdf del sumario si disponible
+      const urlPdfFromSumario = item.url_pdf && (item.url_pdf.texto || item.url_pdf.text || item.url_pdf);
+      urlPdf = (typeof urlPdfFromSumario === 'string' ? urlPdfFromSumario : '') ||
+               `https://www.boe.es/buscar/doc.php?id=${id}`;
+    }
+  }
+
   const monto = parseMontoFromText(`${titulo} ${descripcion}`);
 
-  return { id, titulo, descripcion, tipo, departamento, seccion, url, fecha: '', monto };
+  return { id, titulo, descripcion, tipo, departamento, seccion, url, urlPdf, fecha: '', monto };
 }
 
 const KEYWORDS_AYUDAS = [
@@ -156,8 +207,18 @@ class AyudasService {
 
         if (disposiciones.length > 0) diasConDatos++;
 
-        const ayudas = disposiciones.map(normalizarDisposicion).filter(esAyuda);
+        const ayudas = disposiciones.map(d => normalizarDisposicion(d, fecha)).filter(esAyuda);
         console.log(`[BOE] ${param}: ${ayudas.length} ayudas/subvenciones`);
+        // Enriquecer montos con texto completo del XML (en paralelo, máx 5 a la vez)
+        const chunk = 5;
+        for (let j = 0; j < ayudas.length; j += chunk) {
+          const batch = ayudas.slice(j, j + chunk);
+          await Promise.all(batch.map(async a => {
+            if (a.monto == null && a.id) {
+              a.monto = await fetchMontoFromXML(a.id);
+            }
+          }));
+        }
         todasLasAyudas.push(...ayudas);
 
       } catch (e) {

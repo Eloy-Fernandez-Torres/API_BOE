@@ -1852,3 +1852,52 @@ body.theme-dark .theme-toggle:hover {
   opacity: 0.85;
 }
 
+
+/* ─── Botón PDF + monto ──────────────────────────────────────────────── */
+.result-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.result-actions .result-link {
+  margin-top: 0;
+}
+
+.result-link-pdf {
+  color: #c0392b !important;
+}
+
+.result-link-pdf:hover {
+  color: #922b21 !important;
+}
+
+.result-monto {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 0.95rem;
+  color: var(--boe-blue);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+body.theme-dark .result-monto {
+  color: #9ad0ff;
+}
+
+body.theme-dark .result-link-pdf {
+  color: #ff7f7f !important;
+}
+
+.monto-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+  margin-right: 4px;
+}
